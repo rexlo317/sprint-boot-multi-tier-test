@@ -3,6 +3,8 @@ package com.oocl.web.sampleWebApp;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oocl.web.sampleWebApp.domain.ParkingBoy;
 import com.oocl.web.sampleWebApp.domain.ParkingBoyRepository;
+import com.oocl.web.sampleWebApp.domain.ParkingLot;
+import com.oocl.web.sampleWebApp.domain.ParkingLotRepository;
 import com.oocl.web.sampleWebApp.models.ParkingBoyResponse;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,9 +29,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-public class SampleWebAppApplicationTests {
+public class ParkingBoyTest {
     @Autowired
     private ParkingBoyRepository parkingBoyRepository;
+
+    @Autowired
+    private ParkingLotRepository parkingLotRepository;
 
     @Autowired
     private MockMvc mvc;
