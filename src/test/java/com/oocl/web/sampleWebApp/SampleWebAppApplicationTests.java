@@ -73,4 +73,23 @@ public class SampleWebAppApplicationTests {
 
         assertEquals("1", actualBoy.getEmployeeId());
     }
+
+    @Test
+    public void should_return_400_bad_request() throws Exception {
+        // Given
+        ParkingBoy longIDParkingBoy = new ParkingBoy("12345678901");
+        final ObjectMapper mapper = new ObjectMapper();
+        final String jsonContent = mapper.writeValueAsString(longIDParkingBoy);
+        // When
+        final MvcResult result = mvc.perform(post("/parkingboys")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(jsonContent))
+                                    .andDo(print())
+                                    .andExpect(status().isBadRequest())
+                                    .andReturn();
+        // Then
+        boolean hasBoy = parkingBoyRepository.findById(1L).isPresent();
+        assertEquals(400, result.getResponse().getStatus());
+        assertEquals(false, hasBoy);
+    }
 }

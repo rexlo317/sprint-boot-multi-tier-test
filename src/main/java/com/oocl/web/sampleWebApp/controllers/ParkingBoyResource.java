@@ -26,8 +26,12 @@ public class ParkingBoyResource {
 
     @PostMapping( produces ={"application/json"})
     public ResponseEntity<String> postBoy(@RequestBody ParkingBoy parkingBoy){
-        parkingBoyRepository.save(parkingBoy);
-        Long parkingBoyID = parkingBoy.getId();
-        return ResponseEntity.created(URI.create("/parkingboys/" + parkingBoyID)).body("A Parking Boy is created!");
+        try {
+            parkingBoyRepository.save(parkingBoy);
+            Long parkingBoyID = parkingBoy.getId();
+            return ResponseEntity.created(URI.create("/parkingboys/" + parkingBoyID)).body("A Parking Boy is created!");
+        } catch (Exception e){
+            return ResponseEntity.badRequest().body("JSON input error");
+        }
     }
 }
