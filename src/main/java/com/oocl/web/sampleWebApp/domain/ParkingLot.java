@@ -1,5 +1,7 @@
 package com.oocl.web.sampleWebApp.domain;
 
+import org.hibernate.annotations.DynamicUpdate;
+
 import javax.persistence.*;
 
 @Entity
@@ -17,6 +19,17 @@ public class ParkingLot {
 
     @Column(name = "available_position_count", length = 3, nullable = false)
     private int availablePositionCount;
+
+    @Column(name = "parking_boy_id", length = 10)
+    private Long parkingBoyId;
+
+    public Long getParkingBoyId() {
+        return parkingBoyId;
+    }
+
+    public void setParkingBoyId(Long parkingBoyId) {
+        this.parkingBoyId = parkingBoyId;
+    }
 
     public Long getId() {
         return id;

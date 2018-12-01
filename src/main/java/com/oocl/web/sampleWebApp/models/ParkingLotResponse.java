@@ -9,6 +9,17 @@ public class ParkingLotResponse {
     private String parkingLotId;
     private int capacity;
 
+    public Long getParkingBoyId() {
+        return parkingBoyId;
+    }
+
+    public void setParkingBoyId(Long parkingBoyId) {
+        this.parkingBoyId = parkingBoyId;
+    }
+
+    private Long parkingBoyId;
+
+
     public int getCapacity() {
         return capacity;
     }
@@ -35,8 +46,21 @@ public class ParkingLotResponse {
         return response;
     }
 
+    public static ParkingLotResponse create(String parkingLotId, int capacity, Long parkingBoyId) {
+        Objects.requireNonNull(parkingLotId);
+        Objects.requireNonNull(capacity);
+
+        final ParkingLotResponse response = new ParkingLotResponse();
+        response.setParkingLotId(parkingLotId);
+        response.setCapacity(capacity);
+        response.setParkingBoyId(parkingBoyId);
+        return response;
+    }
+
     public static ParkingLotResponse create(ParkingLot entity) {
-        return create(entity.getParkingLotId(), entity.getCapacity());
+        if (entity.getParkingBoyId() == null)
+            return create(entity.getParkingLotId(), entity.getCapacity());
+        return create(entity.getParkingLotId(),entity.getCapacity(),entity.getParkingBoyId());
     }
 
     @JsonIgnore

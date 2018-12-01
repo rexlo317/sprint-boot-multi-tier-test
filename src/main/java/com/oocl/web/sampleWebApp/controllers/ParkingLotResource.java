@@ -1,5 +1,7 @@
 package com.oocl.web.sampleWebApp.controllers;
 
+import com.oocl.web.sampleWebApp.domain.ParkingBoy;
+import com.oocl.web.sampleWebApp.domain.ParkingBoyRepository;
 import com.oocl.web.sampleWebApp.domain.ParkingLot;
 import com.oocl.web.sampleWebApp.domain.ParkingLotRepository;
 import com.oocl.web.sampleWebApp.models.ParkingLotResponse;
@@ -14,6 +16,9 @@ import java.net.URI;
 public class ParkingLotResource {
 
     @Autowired
+    private ParkingBoyRepository parkingBoyRepository;
+
+    @Autowired
     private ParkingLotRepository parkingLotRepository;
 
     @GetMapping
@@ -24,15 +29,27 @@ public class ParkingLotResource {
         return ResponseEntity.ok(parkingLots);
     }
 
-    @PostMapping( produces ={"application/json"})
+    @PostMapping(produces ={"application/json"})
     public ResponseEntity<String> postLot(@RequestBody ParkingLot parkingLot){
-        try {
-            parkingLot.setAvailablePositionCount(parkingLot.getCapacity());
-            parkingLotRepository.save(parkingLot);
-            Long parkingLotID = parkingLot.getId();
-            return ResponseEntity.created(URI.create("/parkinglots/" + parkingLotID)).body("A Parking Lot is created!");
-        } catch (Exception e){
-            return ResponseEntity.badRequest().body("JSON input error");
-        }
+        if (parkingLot.getCapacity()<1 || parkingLot.getCapacity()>100)
+            return ResponseEntity.badRequest().body("Capacity not in range");
+        if (parkingLot.getParkingLotId().length()>10)
+            return ResponseEntity.badRequest().body("Parking Lot Id too long");
+        parkingLot.setAvailablePositionCount(parkingLot.getCapacity());
+        parkingLotRepository.save(parkingLot);
+        Long parkingLotID = parkingLot.getId();
+        return ResponseEntity.created(URI.create("/parkinglots/" + parkingLotID)).body("A Parking Lot is created!");
+
+    }
+
+    @PutMapping(path = "/{parkingLotId}/parkingBoy/{parkingBoyId}",produces = {"application/json"})
+    public ResponseEntity<String> putLot(@PathVariable Long parkingLotId, @PathVariable Long parkingBoyId){
+        ParkingBoy parkingBoy = parkingBoyRepository.findById(parkingBoyId).get();
+        ParkingLot parkingLot = parkingLotRepository.findById(parkingLotId).get();
+        parkingBoy.assignLot(parkingLot);
+        parkingLot.setParkingBoyId(parkingBoyId);
+        parkingBoyRepository.save(parkingBoy);
+        parkingLotRepository.save(parkingLot);
+        return ResponseEntity.ok().body("Assigned to boy");
     }
 }
