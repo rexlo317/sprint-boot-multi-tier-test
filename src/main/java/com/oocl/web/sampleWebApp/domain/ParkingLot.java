@@ -9,13 +9,13 @@ public class ParkingLot {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "parkinglot_id", length = 10, unique = true, nullable = false)
+    @Column(name = "parking_lot_id", length = 10, unique = true, nullable = false)
     private String parkingLotId;
 
     @Column(name = "capacity", length = 3, nullable = false)
     private int capacity;
 
-    @Column(name = "availablePositionCount", length = 3, nullable = false)
+    @Column(name = "available_position_count", length = 3, nullable = false)
     private int availablePositionCount;
 
     public Long getId() {
@@ -32,6 +32,10 @@ public class ParkingLot {
 
     public int getCapacity() {
         return capacity;
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
     }
 
     public int getAvailablePositionCount() {

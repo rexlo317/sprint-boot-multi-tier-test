@@ -27,6 +27,7 @@ public class ParkingLotResource {
     @PostMapping( produces ={"application/json"})
     public ResponseEntity<String> postLot(@RequestBody ParkingLot parkingLot){
         try {
+            parkingLot.setAvailablePositionCount(parkingLot.getCapacity());
             parkingLotRepository.save(parkingLot);
             Long parkingLotID = parkingLot.getId();
             return ResponseEntity.created(URI.create("/parkinglots/" + parkingLotID)).body("A Parking Lot is created!");

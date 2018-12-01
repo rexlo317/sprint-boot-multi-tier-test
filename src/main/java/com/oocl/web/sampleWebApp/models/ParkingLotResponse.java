@@ -31,6 +31,7 @@ public class ParkingLotResponse {
 
         final ParkingLotResponse response = new ParkingLotResponse();
         response.setParkingLotId(parkingLotId);
+        response.setCapacity(capacity);
         return response;
     }
 
