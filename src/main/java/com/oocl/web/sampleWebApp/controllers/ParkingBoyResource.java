@@ -26,12 +26,18 @@ public class ParkingBoyResource {
 
     @PostMapping( produces ={"application/json"})
     public ResponseEntity<String> postBoy(@RequestBody ParkingBoy parkingBoy){
-        try {
+        if (parkingBoy.getEmployeeId() == null){
+            return ResponseEntity.badRequest().body("Employee Id cannot be null");
+        }
+        if (parkingBoy.getEmployeeId().length()>10) {
+            return ResponseEntity.badRequest().body("Employee Id too long");
+        }
+        try{
             parkingBoyRepository.save(parkingBoy);
             Long parkingBoyID = parkingBoy.getId();
             return ResponseEntity.created(URI.create("/parkingboys/" + parkingBoyID)).body("A Parking Boy is created!");
         } catch (Exception e){
-            return ResponseEntity.badRequest().body("JSON input error");
+            return ResponseEntity.badRequest().body("Id already exists");
         }
     }
 }

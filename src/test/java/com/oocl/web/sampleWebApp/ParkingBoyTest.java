@@ -42,7 +42,7 @@ public class ParkingBoyTest {
 	@Test
 	public void should_get_parking_boys() throws Exception {
 	    // Given
-        final ParkingBoy boy = parkingBoyRepository.save(new ParkingBoy("boy"));
+        final ParkingBoy boy = parkingBoyRepository.save(new ParkingBoy("boy", null));
 
         // When
         final MvcResult result = mvc.perform(MockMvcRequestBuilders
@@ -61,7 +61,7 @@ public class ParkingBoyTest {
     @Test
     public void should_post_parking_boys() throws Exception {
         // Given
-        ParkingBoy parkingBoy = new ParkingBoy("1");
+        ParkingBoy parkingBoy = new ParkingBoy("1",null);
         final ObjectMapper mapper = new ObjectMapper();
         final String jsonContent = mapper.writeValueAsString(parkingBoy);
         // When
@@ -75,14 +75,13 @@ public class ParkingBoyTest {
         // Then
         ParkingBoy actualBoy = parkingBoyRepository.findAll().get(0);
         assertEquals(201, result.getResponse().getStatus());
-
         assertEquals("1", actualBoy.getEmployeeId());
     }
 
     @Test
-    public void should_return_400_bad_request() throws Exception {
+    public void should_return_400_bad_request_id_cannot_be_null() throws Exception {
         // Given
-        ParkingBoy longIDParkingBoy = new ParkingBoy("12345678901");
+        ParkingBoy longIDParkingBoy = new ParkingBoy(null, null);
         final ObjectMapper mapper = new ObjectMapper();
         final String jsonContent = mapper.writeValueAsString(longIDParkingBoy);
         // When
@@ -93,8 +92,45 @@ public class ParkingBoyTest {
                                     .andExpect(status().isBadRequest())
                                     .andReturn();
         // Then
-        boolean hasBoy = parkingBoyRepository.findById(1L).isPresent();
         assertEquals(400, result.getResponse().getStatus());
-        assertEquals(false, hasBoy);
+        assertEquals("Employee Id cannot be null", result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void should_return_400_bad_request_id_too_long() throws Exception {
+        // Given
+        ParkingBoy longIDParkingBoy = new ParkingBoy("12345678901", null);
+        final ObjectMapper mapper = new ObjectMapper();
+        final String jsonContent = mapper.writeValueAsString(longIDParkingBoy);
+        // When
+        final MvcResult result = mvc.perform(post("/parkingboys")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(jsonContent))
+                                    .andDo(print())
+                                    .andExpect(status().isBadRequest())
+                                    .andReturn();
+        // Then
+        assertEquals(400, result.getResponse().getStatus());
+        assertEquals("Employee Id too long", result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void should_return_400_bad_request_id_already_exist() throws Exception {
+        // Given
+        ParkingBoy sameIDParkingBoy = new ParkingBoy("123", null);
+        final ObjectMapper mapper = new ObjectMapper();
+        final String jsonContent = mapper.writeValueAsString(sameIDParkingBoy);
+        // When
+        final MvcResult result = mvc.perform(post("/parkingboys")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(jsonContent))
+                                    .andReturn();
+        final MvcResult sameIdResult = mvc.perform(post("/parkingboys")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(jsonContent))
+                                    .andReturn();
+        // Then
+        assertEquals(400, sameIdResult.getResponse().getStatus());
+        assertEquals("Id already exists", sameIdResult.getResponse().getContentAsString());
     }
 }

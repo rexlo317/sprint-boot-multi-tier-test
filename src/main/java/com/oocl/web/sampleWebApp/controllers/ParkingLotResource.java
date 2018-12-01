@@ -33,12 +33,18 @@ public class ParkingLotResource {
     public ResponseEntity<String> postLot(@RequestBody ParkingLot parkingLot){
         if (parkingLot.getCapacity()<1 || parkingLot.getCapacity()>100)
             return ResponseEntity.badRequest().body("Capacity not in range");
+        if (parkingLot.getParkingLotId() == null)
+            return ResponseEntity.badRequest().body("Parking Lot Id cannot be null");
         if (parkingLot.getParkingLotId().length()>10)
             return ResponseEntity.badRequest().body("Parking Lot Id too long");
-        parkingLot.setAvailablePositionCount(parkingLot.getCapacity());
-        parkingLotRepository.save(parkingLot);
-        Long parkingLotID = parkingLot.getId();
-        return ResponseEntity.created(URI.create("/parkinglots/" + parkingLotID)).body("A Parking Lot is created!");
+        try{
+            parkingLot.setAvailablePositionCount(parkingLot.getCapacity());
+            parkingLotRepository.save(parkingLot);
+            Long parkingLotID = parkingLot.getId();
+            return ResponseEntity.created(URI.create("/parkinglots/" + parkingLotID)).body("A Parking Lot is created!");}
+        catch (Exception e){
+            return ResponseEntity.badRequest().body("Id already exists");
+        }
 
     }
 

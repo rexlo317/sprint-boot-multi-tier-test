@@ -76,7 +76,7 @@ public class ParkingLotTest {
 
 
     @Test
-    public void should_return_400_bad_request() throws Exception {
+    public void should_return_400_bad_request_id_too_long() throws Exception {
         // Given
         ParkingLot longIDParkingLot = new ParkingLot("12345678901",100);
         final ObjectMapper mapper = new ObjectMapper();
@@ -91,6 +91,64 @@ public class ParkingLotTest {
         // Then
         boolean hasLot = parkingLotRepository.findAll().equals(longIDParkingLot);
         assertEquals(400, result.getResponse().getStatus());
+        assertEquals("Parking Lot Id too long", result.getResponse().getContentAsString());
         assertEquals(false, hasLot);
+    }
+    @Test
+    public void should_return_400_bad_request_id_cannot_be_null() throws Exception {
+        // Given
+        ParkingLot nullIDParkingLot = new ParkingLot(null,100);
+        final ObjectMapper mapper = new ObjectMapper();
+        final String jsonContent = mapper.writeValueAsString(nullIDParkingLot);
+        // When
+        final MvcResult result = mvc.perform(post("/parkinglots")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonContent))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        // Then
+        boolean hasLot = parkingLotRepository.findAll().equals(nullIDParkingLot);
+        assertEquals(400, result.getResponse().getStatus());
+        assertEquals("Parking Lot Id cannot be null", result.getResponse().getContentAsString());
+        assertEquals(false, hasLot);
+    }
+    @Test
+    public void should_return_400_bad_request_capacity_not_in_range() throws Exception {
+        // Given
+        ParkingLot notInRangeParkingLot = new ParkingLot(null,1000);
+        final ObjectMapper mapper = new ObjectMapper();
+        final String jsonContent = mapper.writeValueAsString(notInRangeParkingLot);
+        // When
+        final MvcResult result = mvc.perform(post("/parkinglots")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonContent))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        // Then
+        boolean hasLot = parkingLotRepository.findAll().equals(notInRangeParkingLot);
+        assertEquals(400, result.getResponse().getStatus());
+        assertEquals("Capacity not in range", result.getResponse().getContentAsString());
+        assertEquals(false, hasLot);
+    }
+    @Test
+    public void should_return_400_bad_request_id_already_exist() throws Exception {
+        // Given
+        ParkingLot sameIdParkingLot = new ParkingLot("123",100);
+        final ObjectMapper mapper = new ObjectMapper();
+        final String jsonContent = mapper.writeValueAsString(sameIdParkingLot);
+        // When
+        final MvcResult result = mvc.perform(post("/parkinglots")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonContent))
+                .andReturn();
+        final MvcResult sameIdResult = mvc.perform(post("/parkinglots")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonContent))
+                .andReturn();
+        // Then
+        assertEquals(400, sameIdResult.getResponse().getStatus());
+        assertEquals("Id already exists", sameIdResult.getResponse().getContentAsString());
     }
 }
